@@ -108,6 +108,29 @@ def scan_ports():
             print(f"❌ Socket error on port {port}: {e}")
             break
 
+def traceroute():
+    host = input("Enter a domain or IP to trace (e.g. google.com): ").strip()
+    system = platform.system()
+
+    print(f"\n🚀 Tracing route to {host}...\n")
+
+    if system == "Windows":
+        cmd = ["tracert", host]
+    else:
+        cmd = ["traceroute", host]
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        output = result.stdout
+
+        # Count hops (lines with numbers at start)
+        hop_lines = [line for line in output.splitlines() if line.strip().startswith(tuple(str(i) for i in range(1, 50)))]
+        print(output)
+        print(f"\n📍 Hop Count: {len(hop_lines)} hops")
+
+    except Exception as e:
+        print("❌ Traceroute failed:", e)
+
 
 def show_menu():
     while True:
@@ -117,7 +140,8 @@ def show_menu():
         print("2. Ping Host")
         print("3. DNS Lookup")
         print("4. Port Scanner")
-        print("5. Exit")
+        print("5. Traceroute")
+        print("6. Exit")
         choice = input("Choose an option [1–4]: ")
 
         if choice == "1":
@@ -129,6 +153,8 @@ def show_menu():
         elif choice == "4":
             scan_ports()
         elif choice == "5":
+        	traceroute()
+        elif choice == "6":
         	print("👋 Goodbye!")
         	break
         else:
