@@ -131,6 +131,33 @@ def traceroute():
     except Exception as e:
         print("❌ Traceroute failed:", e)
 
+def dns_hijack_check():
+    print("\n🛡️ DNS Hijack Check")
+    trusted_domains = {
+        "google.com": "Expected: Global Google IPs (e.g. 142.x.x.x)",
+        "facebook.com": "Expected: Facebook-owned IPs",
+        "microsoft.com": "Expected: Microsoft/Azure IPs",
+        "icloud.com": "Expected: Apple iCloud",
+        "amazon.com": "Expected: Amazon (AWS)",
+    }
+
+    for domain, expected in trusted_domains.items():
+        try:
+            ip = socket.gethostbyname(domain)
+            print(f"🔍 {domain} → {ip}")
+
+            if ip.startswith("10.") or ip.startswith("192.168.") or ip.startswith("172."):
+                print("⚠️  Potential DNS hijack: resolved to private IP range!")
+            elif ip.startswith("127.") or ip == "0.0.0.0":
+                print("⚠️  Invalid loopback/null address!")
+            else:
+                print(f"✅ Looks okay. {expected}")
+
+        except socket.gaierror:
+            print(f"❌ Could not resolve {domain}.")
+
+        print("-" * 40)
+
 
 def show_menu():
     while True:
@@ -141,8 +168,9 @@ def show_menu():
         print("3. DNS Lookup")
         print("4. Port Scanner")
         print("5. Traceroute")
-        print("6. Exit")
-        choice = input("Choose an option [1–4]: ")
+        print("6. DNS Hijack Check")
+        print("7. Exit")
+        choice = input("Choose an option [1–7]: ")
 
         if choice == "1":
             get_public_ip()
@@ -155,6 +183,8 @@ def show_menu():
         elif choice == "5":
         	traceroute()
         elif choice == "6":
+        	dns_hijack_check()
+        elif choice == "7":
         	print("👋 Goodbye!")
         	break
         else:
